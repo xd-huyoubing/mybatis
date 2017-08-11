@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper接口开发需要遵循以下规范： 1、 Mapper.xml文件中的namespace与mapper接口的类路径相同。 2、 Mapper接口方法名和Mapper.xml中定义的每个statement的id相同 
+	3、 Mapper接口方法的输入参数类型和mapper.xml中定义的每个sql 的parameterType的类型相同 4、 Mapper接口方法的输出参数类型和mapper.xml中定义的每个sql的resultType的类型相同 -->
+<mapper namespace="xidian.edu.mapper.UserMapper">
+
+	<select id="findUserById" parameterType="int" resultType="xidian.edu.pojo.User">
+		select
+		* from user where id=#{id}
+	</select>
+
+	<select id="findUserByUsername" parameterType="string"
+		resultType="xidian.edu.pojo.User">
+		select * from user where username like '%${value}%'
+	</select>
+
+	<!-- 插入没有返回值 -->
+	<!-- <insert id="insertUser" parameterType="xidian.edu.pojo.User"> insert 
+		into user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address}) 
+		</insert> -->
+
+	<insert id="insertUser" parameterType="xidian.edu.pojo.User">
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			select
+			last_insert_id()
+		</selectKey>
+		insert into user(username,birthday,sex,address)
+		values(#{username},#{birthday},#{sex},#{address})
+	</insert>
+
+
+
+	<!-- 一对一关联映射 -->
+	<resultMap type="xidian.edu.pojo.Orders" id="resultOrdersAndUser">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="number" property="number" />
+		<result column="createtime" property="createtime" />
+		<result column="note" property="note" />
+		
+		<association property="user" javaType="xidian.edu.pojo.User">
+			<id column="uid" property="id" />
+			<result column="username" property="username" />
+			<result column="address" property="address" />
+			<result column="birthday" property="birthday" />
+			<result column="sex" property="sex" />
+		</association>
+	</resultMap>
+
+	<select id="findOrdersAndUser" resultMap="resultOrdersAndUser">
+		select o.*,u.id
+		uid,u.username,u.birthday,u.sex,u.address from orders o,user u where
+		o.user_id=u.id
+	</select>
+
+
+	<!-- 一对多关联映射 -->
+	<resultMap type="xidian.edu.pojo.User" id="resultUserAndOrders">
+		<id column="id" property="id" />
+		<result column="username" property="username" />
+		<result column="address" property="address" />
+		<result column="birthday" property="birthday" />
+		<result column="sex" property="sex" />
+
+		<collection property="orders" ofType="xidian.edu.pojo.Orders">
+			<id column="oid" property="id" />
+			<result column="user_id" property="userId" />
+			<result column="number" property="number" />
+			<result column="createtime" property="createtime" />
+			<result column="note" property="note" />
+		</collection>
+
+	</resultMap>
+
+
+	<select id="findUserAndOrders" resultMap="resultUserAndOrders">
+		select u.*,o.id
+		oid,o.user_id,o.number,o.createtime,o.note from user u , orders o
+		where u.id=o.user_id
+
+	</select>
+
+
+</mapper>

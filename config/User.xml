@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="test">
+
+	<select id="findUserById" parameterType="int" resultType="xidian.edu.pojo.User">
+		select
+		* from user where id=#{id}
+	</select>
+
+	<select id="findUserByUsername" parameterType="string"
+		resultType="xidian.edu.pojo.User">
+		select * from user where username like '%${value}%'
+	</select>
+
+	<!-- 插入没有返回值 -->
+	<!-- <insert id="insertUser" parameterType="xidian.edu.pojo.User"> insert 
+		into user(username,birthday,sex,address) values(#{username},#{birthday},#{sex},#{address}) 
+		</insert> -->
+
+	<insert id="insertUser" parameterType="xidian.edu.pojo.User">
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			select
+			last_insert_id()
+		</selectKey>
+		insert into user(username,birthday,sex,address)
+		values(#{username},#{birthday},#{sex},#{address})
+	</insert>
+
+
+	<delete id="deleteUserById" parameterType="int">
+		delete from user where
+		id=#{u_id}
+	</delete>
+	
+	
+	<update id="updateUserById" parameterType="xidian.edu.pojo.User" >
+		update user set username=#{username},birthday=#{birthday} where id=#{id}
+	</update>
+	
+	
+
+</mapper>
